@@ -1,0 +1,431 @@
+# SauceDemo Web Automation – Test Plan
+
+**Project:** SauceDemo Web Automation  
+**Application URL:** https://www.saucedemo.com/  
+**Document Version:** 1.0  
+**Status:** Initial Version  
+**Prepared By:** QA Engineer  
+**Date:** October 19, 2026
+
+---
+
+## 1. Introduction
+
+### 1.1 Purpose
+
+The purpose of this Test Plan is to define the scope, objectives, testing approach, test environment, test data, execution strategy, and completion criteria for testing the SauceDemo web application.
+
+The project combines functional test design with automated testing using Playwright and TypeScript to verify critical application workflows and identify unexpected behavior.
+
+### 1.2 Project Overview
+
+SauceDemo is a sample e-commerce web application that allows users to log in, browse products, sort product listings, manage a shopping cart, and complete a checkout process.
+
+The automation project focuses on validating these core workflows using reusable Page Object classes, structured test data, test tagging, and automated reporting.
+
+---
+
+## 2. Test Objectives
+
+The main objectives are to:
+
+- Verify successful login and appropriate error handling for invalid credentials.
+- Validate product listing and sorting functionality.
+- Verify adding and removing products from the shopping cart.
+- Validate required checkout fields and error messages.
+- Verify product details and prices in the checkout overview.
+- Validate subtotal, tax, and total calculations.
+- Verify successful order completion.
+- Establish reusable automated tests that are easy to maintain and execute.
+- Support Smoke, Regression, and End-to-End test execution.
+- Generate test execution reports using Playwright and Allure.
+
+---
+
+## 3. Scope of Testing
+
+### 3.1 In Scope
+
+**Login**
+- Successful login with valid credentials.
+- Login with invalid credentials.
+- Login with missing username or password.
+- Locked-out user validation.
+- Dismissing the login error message.
+
+**Product Inventory and Sorting**
+- Displaying available products.
+- Verifying product names and prices.
+- Sorting products by name in ascending and descending order.
+- Sorting products by price from low to high and high to low.
+- Verifying product listings after sorting.
+
+**Shopping Cart**
+- Adding a product to the cart.
+- Verifying the cart badge count.
+- Verifying selected product names and prices.
+- Removing products from the inventory page.
+- Removing products from the shopping cart.
+
+**Checkout**
+- Validating missing first name.
+- Validating missing last name.
+- Validating missing postal code.
+- Verifying product names and prices in the checkout overview.
+- Verifying subtotal, tax, and total calculations.
+- Completing an order successfully.
+
+**User Types and Known Behavior**
+- Testing selected SauceDemo user accounts.
+- Investigating unexpected behavior associated with specific test accounts, including `problem_user`.
+
+**Automation and Reporting**
+- Running automated tests through Playwright Test.
+- Executing tests by file, title, or tag.
+- Generating and reviewing Allure reports.
+
+### 3.2 Out of Scope
+
+The following activities are excluded from the current project scope:
+
+- Mobile application testing.
+- Performance, load, and stress testing.
+- Security penetration testing.
+- Testing real payment gateways or external shipping integrations.
+- Cross-browser execution beyond the browsers configured and actually tested.
+- CI/CD pipeline integration unless implemented separately.
+- Accessibility testing unless covered by additional dedicated test cases.
+
+---
+
+## 4. Test Strategy and Approach
+
+The project uses a combination of functional test design and automated UI testing.
+
+### 4.1 Smoke Testing
+
+Smoke testing verifies the essential application functionality and provides a quick indication of whether the main workflow is operational.
+
+The Smoke suite will prioritize critical checks such as successful login and other essential scenarios selected for the suite.
+
+**Execution command:**
+
+`npm run test:smoke`
+
+### 4.2 Regression Testing
+
+Regression testing verifies broader functionality to identify unintended changes or defects.
+
+It includes detailed validation scenarios for login, product sorting, cart operations, and checkout.
+
+**Execution command:**
+
+`npm run test:regression`
+
+### 4.3 End-to-End Testing
+
+End-to-End testing validates a complete user journey across multiple application pages.
+
+The primary E2E scenario covers:
+
+1. Logging in with a valid user.
+2. Adding a product to the cart.
+3. Verifying the cart contents.
+4. Proceeding to checkout.
+5. Entering checkout information.
+6. Verifying the order summary.
+7. Completing the order.
+8. Verifying the order confirmation message.
+
+**Execution command:**
+
+`npm run test:e2e`
+
+### 4.4 Defect Investigation
+
+When unexpected behavior is observed, focused tests are used to reproduce and document the issue.
+
+Known defects must be distinguished from new failures so that expected failures do not get mistaken for new regressions.
+
+**Note:** Test suites are selected through tags in test titles. The actual suite coverage depends on which tests have been tagged.
+
+---
+
+## 5. Test Environment
+
+| Item | Description |
+|---|---|
+| Application | SauceDemo |
+| Application URL | https://www.saucedemo.com/ |
+| Platform | Web |
+| Automation Framework | Playwright Test |
+| Programming Language | TypeScript |
+| Design Pattern | Page Object Model (POM) |
+| Browser | Chromium / Desktop Chrome, as configured |
+| Runtime | Node.js |
+| Package Manager | npm |
+| Test Data | Reusable test data and SauceDemo test accounts |
+| Environment Variables | dotenv |
+| Reporting | Playwright HTML and Allure |
+| Operating System | Windows development environment |
+
+The actual browser version, Node.js version, and execution details should be recorded when test results are collected.
+
+---
+
+## 6. Test Design and Automation Framework
+
+### 6.1 Playwright
+
+Playwright is used for browser automation, UI interactions, assertions, and test execution. Its automatic waiting and locator-based assertions help reduce synchronization issues.
+
+### 6.2 TypeScript
+
+TypeScript provides static type checking and improves the maintainability of test scripts and reusable methods.
+
+### 6.3 Page Object Model
+
+The Page Object Model separates page-specific locators and actions from test scenarios.
+
+The project contains page objects for:
+
+- Login Page
+- Inventory Page
+- Cart Page
+- Checkout Page
+- Overview Page
+
+This structure helps reduce code duplication and makes tests easier to update when page behavior or locators change.
+
+### 6.4 Test Data Management
+
+Reusable test data is maintained separately from test logic where appropriate.
+
+The password is loaded from the `SAUCE_PASSWORD` environment variable rather than being embedded directly in test code.
+
+### 6.5 Reporting
+
+Playwright and Allure reporting are used to review test execution results and investigate failures.
+
+---
+
+## 7. Test Data
+
+The test data includes:
+
+- Valid SauceDemo user credentials.
+- Invalid login credentials.
+- Locked-out user credentials.
+- Product names and prices.
+- Valid checkout information.
+- Checkout data with one required field omitted at a time.
+
+The primary purchase scenario uses the `Sauce Labs Backpack` product.
+
+Credentials must be maintained securely in the local `.env` file and must not be committed to source control.
+
+---
+
+## 8. Entry Criteria
+
+Testing can begin when:
+
+- The SauceDemo application is accessible.
+- Node.js dependencies have been installed.
+- The required Playwright browser has been installed.
+- The local environment variables are configured.
+- Required test data is available.
+- The Playwright configuration is ready.
+- The test cases are available for execution.
+
+---
+
+## 9. Exit Criteria
+
+Testing for the planned scope can be considered complete when:
+
+- All planned test cases have been executed or their execution status has been documented.
+- Results have been reviewed and failures investigated.
+- Critical workflow failures have been reported.
+- Confirmed defects have sufficient reproduction details and supporting evidence where available.
+- Known issues and expected failures have been clearly identified.
+- The relevant execution reports have been generated and reviewed.
+- Remaining coverage gaps and unresolved issues have been documented.
+
+Passing all automated tests alone does not prove that every possible application scenario is defect-free.
+
+---
+
+## 10. Defect Management
+
+When a defect is identified, it should be documented with the following information:
+
+- Bug ID.
+- Title.
+- Description.
+- Preconditions.
+- Steps to reproduce.
+- Expected result.
+- Actual result.
+- Severity.
+- Priority.
+- Environment and browser.
+- Supporting evidence, such as screenshots, traces, or videos, when available.
+
+### Severity Guidelines
+
+| Severity | Description |
+|---|---|
+| Critical | The application is unusable, or a serious security or data-loss issue exists. |
+| High | A core user journey or important functionality is broken. |
+| Medium | A secondary feature or non-blocking functional behavior is affected. |
+| Low | A minor visual, content, or alignment issue is observed. |
+
+Severity describes the impact of a defect. Priority determines how urgently it should be addressed.
+
+Root causes must not be assumed without supporting technical evidence.
+
+---
+
+## 11. Risks and Mitigation
+
+| Risk | Mitigation |
+|---|---|
+| Application unavailable | Verify application availability before execution and record blockers. |
+| Missing or invalid credentials | Validate local environment configuration without exposing secrets. |
+| Flaky automated tests | Prefer Playwright's built-in waiting and locator assertions over fixed delays. |
+| Application changes break locators | Maintain locators and page objects centrally. |
+| Known defects cause test failures | Document known defects and distinguish expected failures from new failures. |
+| Incorrect test suite selection | Verify test tags and the selected test count before execution. |
+| Incomplete coverage | Review planned scenarios against the available test cases and identify gaps. |
+
+---
+
+## 12. Test Deliverables
+
+The project deliverables include:
+
+1. Test Plan document.
+2. Excel test case document: `TestCases/SauceDemo_Test_Cases.xlsx`.
+3. Automated test scripts in the `tests/` directory.
+4. Reusable Page Object classes in the `pages/` directory.
+5. Test data files in the `test-data/` directory.
+6. Playwright execution results.
+7. Allure test execution report.
+8. Defect reports and supporting evidence, where applicable.
+9. README documentation describing setup and execution.
+
+---
+
+## 13. Test Execution Commands
+
+Run the following commands from the project root directory.
+
+| Activity | Command |
+|---|---|
+| Run all tests | `npm run test:all` |
+| Run Smoke tests | `npm run test:smoke` |
+| Run Regression tests | `npm run test:regression` |
+| Run E2E tests | `npm run test:e2e` |
+| Run tests with a visible browser | `npm run test:all -- --headed` |
+| Generate Allure report | `npm run report:allure` |
+| Open Allure report | `npm run report:allure:open` |
+
+The Smoke, Regression, and E2E commands depend on the corresponding tags being present in the test titles.
+
+---
+
+## 14. Assumptions and Limitations
+
+- The project targets the SauceDemo web application.
+- The current automation scope focuses on functional UI testing.
+- The E2E suite validates the implemented purchase journey and does not cover every possible checkout combination.
+- Tests for known user-specific issues are investigative and should be interpreted according to their assertions.
+- Cross-browser, performance, security, and CI/CD coverage are not considered completed unless implemented and verified separately.
+- The test plan may be updated as the framework and coverage evolve.
+
+---
+## Test Execution Strategy and Classification
+
+### 1. Smoke Testing
+
+**Tag:** `@smoke`
+
+**Objective:** Verify that the application's essential functionality works and that the build is suitable for further testing.
+
+Smoke tests should focus on critical user journeys, such as successful login and successful checkout.
+
+**Execution command:**
+
+```bash
+npm run test:smoke
+```
+
+### 2. Regression Testing
+
+**Tag:** `@regression`
+
+**Objective:** Verify that existing functionality continues to work after code changes.
+
+The regression suite includes applicable functional scenarios covering login, product browsing and sorting, cart operations, checkout validation, order calculations, and order completion.
+
+**Execution command:**
+
+```bash
+npm run test:regression
+```
+
+### 3. High-Severity Test Classification
+
+**Tag:** `@severity-high`
+
+**Objective:** Identify tests associated with functionality whose failure could have a significant impact on the system or its users.
+
+Apply this tag when a test validates functionality with a documented high-impact failure risk.
+
+**Execution command:**
+
+```bash
+npm run test:high-severity
+```
+
+### 4. High-Priority Test Classification
+
+**Tag:** `@priority-high`
+
+**Objective:** Identify tests that should receive early attention because of business importance, release risk, or the impact of a potential failure on the user journey.
+
+Apply this tag based on the agreed test execution and release priorities.
+
+**Execution command:**
+
+```bash
+npm run test:high-priority
+```
+
+### 5. Classification Guidelines
+
+- Severity and priority represent different concepts and must be assessed independently.
+- Severity describes the impact of a failure; priority describes how urgently the related functionality or issue needs attention.
+- Test tags represent the classification of a test scenario, not the confirmed severity or priority of an actual defect.
+- A test may have multiple tags when appropriate.
+- Tests without a requested tag will not be selected by the corresponding `--grep` command.
+- Running the full test suite does not automatically execute high-priority tests first. The commands above run the selected categories separately.
+
+### 6. Execution Recommendation
+
+For a typical validation cycle:
+
+1. Execute Smoke Tests to validate the main user journeys.
+2. Execute High-Priority Tests when early feedback on business-critical functionality is required.
+3. Execute High-Severity Tests to focus on scenarios associated with significant failure impact.
+4. Execute the Regression Suite for broader functional coverage.
+
+The exact sequence may be adjusted according to release risk, available execution time, and the team's testing strategy.
+
+
+## 15. Conclusion
+
+This Test Plan defines the current testing approach for the SauceDemo web automation project.
+
+By combining functional test design, Playwright, TypeScript, the Page Object Model, tagged test execution, and Allure reporting, the project aims to provide repeatable verification of key user workflows and a maintainable foundation for future test coverage improvements.
