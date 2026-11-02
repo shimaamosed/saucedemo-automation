@@ -8,6 +8,7 @@ export class CartPage {
   private readonly cartItemPrices: Locator;
   private readonly checkoutButton: Locator;
   private readonly continueShoppingButton: Locator;
+  private readonly cartItemQuantities: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -17,6 +18,7 @@ export class CartPage {
     this.cartItemPrices = page.getByTestId('inventory-item-price');
     this.checkoutButton = page.getByTestId('checkout');
     this.continueShoppingButton = page.getByTestId('continue-shopping');
+    this.cartItemQuantities = page.getByTestId('item-quantity');
   }
 
   async getProductNames(): Promise<string[]> {
@@ -30,6 +32,11 @@ export class CartPage {
       Number(price.replace('$', '').trim())
     );
   }
+  async getProductQuantities(): Promise<number[]> {
+  const quantities = await this.cartItemQuantities.allTextContents();
+
+  return quantities.map((quantity) => Number(quantity.trim()));
+}
 
   async getCartItemCount(): Promise<number> {
     return this.cartItems.count();

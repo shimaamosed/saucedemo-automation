@@ -4,6 +4,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 import { loginSuccessData } from '../test-data/login.data';
+import { products } from '../test-data/products.data';
 
 const validPassword = process.env.SAUCE_PASSWORD;
 
@@ -26,75 +27,114 @@ test.describe('Shopping Cart', () => {
   });
 
   test('adds a product and updates the cart badge', async () => {
-    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart(products.backpack.name);
 
     await expect(inventoryPage.getCartBadge()).toHaveText('1');
   });
 
-test('changes Add to cart to Remove after adding a product', async () => {
-  await inventoryPage.addProductToCart('Sauce Labs Backpack');
+  test('changes Add to cart to Remove after adding a product', async () => {
+    await inventoryPage.addProductToCart(products.backpack.name);
 
-  await expect(
-    inventoryPage.getProductRemoveButton('Sauce Labs Backpack')
-  ).toBeVisible();
+    await expect(
+      inventoryPage.getProductRemoveButton(products.backpack.name)
+    ).toBeVisible();
 
-  await expect(
-    inventoryPage.getProductAddButton('Sauce Labs Backpack')
-  ).toHaveCount(0);
-});
-
-  test('shows the correct product name and price in the cart', async () => {
-    await inventoryPage.addProductToCart('Sauce Labs Backpack');
-    await inventoryPage.openCart();
-
-    expect(await cartPage.getProductNames()).toEqual([
-      'Sauce Labs Backpack',
-    ]);
-
-    expect(await cartPage.getProductPrices()).toEqual([29.99]);
+    await expect(
+      inventoryPage.getProductAddButton(products.backpack.name)
+    ).toHaveCount(0);
   });
 
-  test('shows both products when two products are added', async () => {
-    await inventoryPage.addProductToCart('Sauce Labs Backpack');
-    await inventoryPage.addProductToCart('Sauce Labs Bike Light');
+  test('shows the correct product name and price in the cart', async () => {
+    await inventoryPage.addProductToCart(products.backpack.name);
     await inventoryPage.openCart();
 
-    expect(await cartPage.getProductNames()).toEqual([
-      'Sauce Labs Backpack',
-      'Sauce Labs Bike Light',
-    ]);
+    await expect
+      .poll(() => cartPage.getProductNames())
+      .toEqual([products.backpack.name]);
 
-    expect(await cartPage.getCartItemCount()).toBe(2);
+    await expect
+      .poll(() => cartPage.getProductPrices())
+      .toEqual([products.backpack.price]);
+
+    await expect
+      .poll(() => cartPage.getProductQuantities())
+      .toEqual([1]);
+  });
+
+  test('shows the correct names, prices, and quantities when two products are added', async () => {
+    await inventoryPage.addProductToCart(products.backpack.name);
+    await inventoryPage.addProductToCart(products.bikeLight.name);
+
+    await expect(inventoryPage.getCartBadge()).toHaveText('2');
+
+    await inventoryPage.openCart();
+
+    await expect
+      .poll(() => cartPage.getProductNames())
+      .toEqual([
+        products.backpack.name,
+        products.bikeLight.name,
+      ]);
+
+    await expect
+      .poll(() => cartPage.getProductPrices())
+      .toEqual([
+        products.backpack.price,
+        products.bikeLight.price,
+      ]);
+
+    await expect
+      .poll(() => cartPage.getProductQuantities())
+      .toEqual([1, 1]);
+
+    await expect
+      .poll(() => cartPage.getCartItemCount())
+      .toBe(2);
   });
 
   test('removes a product from the inventory page', async () => {
-    await inventoryPage.addProductToCart('Sauce Labs Backpack');
-    await inventoryPage.removeProductFromCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart(products.backpack.name);
+    await inventoryPage.removeProductFromCart(products.backpack.name);
 
-    expect(await inventoryPage.getCartCount()).toBe(0);
+    await expect
+      .poll(() => inventoryPage.getCartCount())
+      .toBe(0);
   });
 
   test('removes a product from the cart page', async () => {
-    await inventoryPage.addProductToCart('Sauce Labs Backpack');
-    await inventoryPage.addProductToCart('Sauce Labs Bike Light');
+    await inventoryPage.addProductToCart(products.backpack.name);
+    await inventoryPage.addProductToCart(products.bikeLight.name);
     await inventoryPage.openCart();
 
-    await cartPage.removeProduct('Sauce Labs Backpack');
+    await cartPage.removeProduct(products.backpack.name);
 
-    expect(await cartPage.getProductNames()).toEqual([
-      'Sauce Labs Bike Light',
-    ]);
+    await expect
+      .poll(() => cartPage.getProductNames())
+      .toEqual([products.bikeLight.name]);
 
-    expect(await cartPage.getCartItemCount()).toBe(1);
+    await expect
+      .poll(() => cartPage.getCartItemCount())
+      .toBe(1);
+
+    await expect
+      .poll(() => cartPage.getProductQuantities())
+      .toEqual([1]);
   });
 
   test('shows an empty cart after removing all products', async () => {
-    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart(products.backpack.name);
+    await inventoryPage.addProductToCart(products.bikeLight.name);
     await inventoryPage.openCart();
 
-    await cartPage.removeProduct('Sauce Labs Backpack');
+    await cartPage.removeProduct(products.backpack.name);
+    await cartPage.removeProduct(products.bikeLight.name);
 
-    expect(await cartPage.getCartItemCount()).toBe(0);
-    expect(await cartPage.getProductNames()).toEqual([]);
+    await expect
+      .poll(() => cartPage.getCartItemCount())
+      .toBe(0);
+
+    await expect
+      .poll(() => cartPage.getProductNames())
+      .toEqual([]);
   });
 });

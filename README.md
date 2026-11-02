@@ -37,16 +37,24 @@ Allure provides structured test reports to help review execution results and inv
 
 ## 3. Project Structure
 
-```text
 saucedemo-automation/
+│
 ├── pages/
 │   ├── CartPage.ts
 │   ├── CheckoutPage.ts
 │   ├── InventoryPage.ts
 │   ├── LoginPage.ts
 │   └── OverviewPage.ts
+│
 ├── test-data/
-│   └── login.data.ts
+│   ├── checkout.data.ts
+│   ├── login.data.ts
+│   └── products.data.ts
+│
+├── TestFiles/
+│   ├── SauceDemo_Test_Cases.xlsx
+│   └── TestPlan/
+│
 ├── tests/
 │   ├── cart.spec.ts
 │   ├── checkout-e2e.spec.ts
@@ -55,20 +63,15 @@ saucedemo-automation/
 │   ├── problem-user.spec.ts
 │   ├── sorting.spec.ts
 │   └── users.spec.ts
-├── TestFiles/
-│   ├── SauceDemo_Test_Cases.xlsx
-│   └── TestPlan/
-├── playwright-report/
-├── test-results/
-├── package.json
-├── playwright.config.ts
-├── .env
+│
 ├── .gitignore
-└── README.md
-```
+├── package.json
+├── package-lock.json
+├── playwright.config.ts
+├── README.md
+└── .env.example
 
-*Note: Generated reports and test results may appear after test execution. The `.env` file is local configuration and should not be committed.*
-
+ 
 ### Directory Responsibilities
 
 - **`pages/`** — Contains Page Object classes for login, inventory, cart, checkout, and order overview.

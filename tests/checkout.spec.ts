@@ -1,4 +1,3 @@
-
 import { test, expect } from '@playwright/test';
 
 import { LoginPage } from '../pages/LoginPage';
@@ -8,6 +7,14 @@ import { CheckoutPage } from '../pages/CheckoutPage';
 import { OverviewPage } from '../pages/OverviewPage';
 
 import { loginSuccessData } from '../test-data/login.data';
+
+import {
+  checkoutUsers,
+  checkoutValidationScenarios,
+  checkoutExpectedValues,
+} from '../test-data/checkout.data';
+
+import { products } from '../test-data/products.data';
 
 const validPassword = process.env.SAUCE_PASSWORD;
 
@@ -30,53 +37,60 @@ test.describe('Checkout Tests', () => {
     cartPage = new CartPage(page);
     checkoutPage = new CheckoutPage(page);
 
-    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart(products.backpack.name);
     await inventoryPage.openCart();
     await cartPage.checkout();
   });
 
-  test('shows an error when first name is missing @regression', async () => {
-    await checkoutPage.fillInformation('', '', '');
-    await checkoutPage.continueToOverview();
+  // Checkout validation tests
+  for (const scenario of checkoutValidationScenarios) {
+    test(`shows an error when ${scenario.title} @regression`, async () => {
+      await checkoutPage.fillInformation(
+        scenario.firstName,
+        scenario.lastName,
+        scenario.postalCode
+      );
 
-    await expect(checkoutPage.errorMessage)
-      .toHaveText('Error: First Name is required');
-  });
+      await checkoutPage.continueToOverview();
 
-  test('shows an error when last name is missing @regression', async () => {
-    await checkoutPage.fillInformation('Test', '', '');
-    await checkoutPage.continueToOverview();
+      await expect(checkoutPage.errorMessage).toHaveText(
+        scenario.expectedError
+      );
+    });
+  }
 
-    await expect(checkoutPage.errorMessage)
-      .toHaveText('Error: Last Name is required');
-  });
-
-  test('shows an error when postal code is missing @regression', async () => {
-    await checkoutPage.fillInformation('Test', 'User', '');
-    await checkoutPage.continueToOverview();
-
-    await expect(checkoutPage.errorMessage)
-      .toHaveText('Error: Postal Code is required');
-  });
-
+  // Verify products and prices in checkout overview
   test(
     'displays the correct products and prices in checkout overview @regression',
     async ({ page }) => {
-      await checkoutPage.fillInformation('Test', 'User', '12345');
+      await checkoutPage.fillInformation(
+        checkoutUsers.validUser.firstName,
+        checkoutUsers.validUser.lastName,
+        checkoutUsers.validUser.postalCode
+      );
+
       await checkoutPage.continueToOverview();
 
       const overviewPage = new OverviewPage(page);
 
-      await expect.poll(() => overviewPage.getItemNames())
-        .toEqual(['Sauce Labs Backpack']);
+      await expect
+        .poll(() => overviewPage.getItemNames())
+        .toEqual([products.backpack.name]);
 
-      await expect.poll(() => overviewPage.getItemPrices())
-        .toEqual([29.99]);
+      await expect
+        .poll(() => overviewPage.getItemPrices())
+        .toEqual([products.backpack.price]);
     }
   );
 
+  // Verify subtotal, tax, and total calculations
   test('calculates subtotal and total correctly @regression', async ({ page }) => {
-    await checkoutPage.fillInformation('Test', 'User', '12345');
+    await checkoutPage.fillInformation(
+      checkoutUsers.validUser.firstName,
+      checkoutUsers.validUser.lastName,
+      checkoutUsers.validUser.postalCode
+    );
+
     await checkoutPage.continueToOverview();
 
     const overviewPage = new OverviewPage(page);
@@ -85,20 +99,33 @@ test.describe('Checkout Tests', () => {
     const tax = await overviewPage.getTax();
     const total = await overviewPage.getTotal();
 
-    expect(subtotal).toBe(29.99);
-    expect(tax).toBe(2.40);
-    expect(total).toBe(32.39);
+    expect(subtotal).toBe(products.backpack.price);
+    expect(tax).toBe(checkoutExpectedValues.tax);
+
+    expect(total).toBe(
+      Number((subtotal + tax).toFixed(2))
+    );
   });
 
-  test('completes the order successfully @regression @priority-high @severity-critical', async ({ page }) => {
-    await checkoutPage.fillInformation('Test', 'User', '12345');
-    await checkoutPage.continueToOverview();
+  // Complete the order successfully
+  test(
+    'completes the order successfully @regression @priority-high @severity-high',
+    async ({ page }) => {
+      await checkoutPage.fillInformation(
+        checkoutUsers.validUser.firstName,
+        checkoutUsers.validUser.lastName,
+        checkoutUsers.validUser.postalCode
+      );
 
-    const overviewPage = new OverviewPage(page);
+      await checkoutPage.continueToOverview();
 
-    await overviewPage.finishOrder();
+      const overviewPage = new OverviewPage(page);
 
-    await expect(overviewPage.confirmationHeader)
-      .toHaveText('Thank you for your order!');
-  });
+      await overviewPage.finishOrder();
+
+      await expect(overviewPage.confirmationHeader).toHaveText(
+        'Thank you for your order!'
+      );
+    }
+  );
 });

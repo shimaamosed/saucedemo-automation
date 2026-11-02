@@ -54,6 +54,7 @@ test.describe('Product Sorting', () => {
     await expect(inventoryPage.getSortDropdown()).toHaveValue('lohi');
 
     const prices = await inventoryPage.getProductPrices();
+    expect(prices.length).toBeGreaterThan(1);
     const sortedPrices = [...prices].sort((a, b) => a - b);
 
     expect(prices).toEqual(sortedPrices);

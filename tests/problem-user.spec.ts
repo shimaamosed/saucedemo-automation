@@ -2,6 +2,8 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
+import { products } from '../test-data/products.data';
+import { users } from '../test-data/login.data';
 
 const password = process.env.SAUCE_PASSWORD;
 
@@ -15,11 +17,10 @@ test.describe('Problem User - Functional Tests', () => {
     const inventoryPage = new InventoryPage(page);
 
     await loginPage.goto('/');
-    await loginPage.login('problem_user', password!);
-
+await loginPage.login(users.problem, password);
     await expect(page).toHaveURL(/inventory\.html/);
 
-    const productName = 'Sauce Labs Backpack';
+    const productName = products.backpack.name;
 
     await inventoryPage.addProductToCart(productName);
 
